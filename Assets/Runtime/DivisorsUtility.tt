@@ -1,0 +1,105 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Numerics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" #>
+<#@ assembly name="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Numerics" #>
+<#
+    static BigInteger Sqrt(BigInteger n)
+    {
+        if (n == BigInteger.Zero) return n;
+        if (n < BigInteger.Zero) throw new ArithmeticException("NaN");
+
+        var bitLength = Convert.ToInt32(Math.Ceiling(BigInteger.Log(n, 2)));
+        BigInteger root = BigInteger.One << (bitLength / 2);
+
+        while (!IsSqrt(n, root))
+        {
+            root += n / root;
+            root /= 2;
+        }
+
+        return root;
+    }
+
+    static bool IsSqrt(BigInteger n, BigInteger root)
+    {
+        BigInteger lowerBound = root * root;
+        BigInteger upperBound = (root + 1) * (root + 1);
+
+        return n >= lowerBound && n < upperBound;
+    }
+
+    static void CalculateDivisors(BigInteger n, ICollection<BigInteger> result)
+    {
+        for (BigInteger i = BigInteger.One; i * i < n; i++)
+        {
+            if (n % i == BigInteger.Zero)
+            {
+                result.Add(i);
+            }
+        }
+        for (BigInteger i = Sqrt(n); i >= 1; i--)
+        {
+            if (n % i == BigInteger.Zero)
+            {
+                result.Add(n / i);
+            }
+        }
+    }
+
+    const int shiftSupport = 31;
+
+    var divisorCache = new List<BigInteger>();
+#>
+using System;
+using System.Collections.Generic;
+
+namespace Fp.Utility
+{
+    public static class DivisorsUtility
+    {
+        /// <summary>
+        /// Divisors of (2^i)-1
+        /// </summary>
+        private static readonly int[][] _divisorsOfPowTwoMinusOne = new int[][]
+        {
+            //(1 << 0) -1 = 0
+            Array.Empty<int>(),
+<#
+    for (var i = 1; i <= shiftSupport; i++)
+    {
+        BigInteger value = (BigInteger.One << i) - 1;
+        CalculateDivisors(value, divisorCache);
+        string divisorValues = string.Join(", ", divisorCache.Select(d => d > int.MaxValue ? $"{d.ToString()}u" : d.ToString()));
+        divisorCache.Clear();
+#>
+            //(1 << <#= i #>) -1 = <#= value.ToString() #>
+            new [] {<#= divisorValues #>},
+<#
+    }
+#>
+        };
+
+        public static IReadOnlyList<int> GetDivisorsOfPowTwoMinusOne(int pow)
+        {
+            ThrowIfIndexOutOfSupportedRange(pow);
+
+            return _divisorsOfPowTwoMinusOne[pow];
+        }
+
+        public static int GetDivisorsOfPowTwoMinusOne(int pow, float pct)
+        {
+            IReadOnlyList<int> divisors = GetDivisorsOfPowTwoMinusOne(pow);
+            return divisors[(int) (divisors.Count * pct)];
+        }
+
+        private static void ThrowIfIndexOutOfSupportedRange(int pow)
+        {
+            if (pow <= 0 || pow >= <#= shiftSupport #>)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pow), "Supported pow is in range [1, <#= shiftSupport #>]");
+            }
+        }
+    }
+}
