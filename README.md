@@ -2,4 +2,4 @@
 Runtime utilities and tools classes
 
 # Unity Package Manager
-Git URL: "https://github.com/FrameProjectTeam/Collections.git?path=/Assets"
+Git URL: "https://github.com/FrameProjectTeam/Fp.Unity.Utility.git?path=/Assets"
