@@ -1193,7 +1193,7 @@ namespace Fp.Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Map01(float value, float min, float max)
         {
-            return (value - min) * 1f / (max - min);
+            return (value - min) / (max - min);
         }
 
         /// <summary>
@@ -1575,6 +1575,22 @@ namespace Fp.Utility
             float third = fourThirds - 1.0f;
             float one = third + third + third;
             return Math.Abs(1.0f - one);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Bias(double x, double bias)
+        {
+            double k = Math.Pow(1 - bias, 3);
+
+            return (x * k) / (x * k - x + 1);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Bias(float x, float bias)
+        {
+            float k = Mathf.Pow(1 - bias, 3);
+
+            return (x * k) / (x * k - x + 1);
         }
     }
 }
