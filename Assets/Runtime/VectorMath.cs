@@ -1307,5 +1307,20 @@ namespace Fp.Utility
         {
             return Mathf.Repeat(AngleInRad(guide, diverged), DoublePi) * Mathf.Rad2Deg;
         }
+		
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void MakeOrthonormalVectors(Vector3 normal, out Vector3 a, out Vector3 b)
+		{
+			float sign = Mathf.Sign(normal.z);
+			float scale = -1 / (sign + normal.z);
+			
+			a.x = normal.x * normal.y * scale;
+			a.y = sign + normal.y * normal.y * scale;
+			a.z = -normal.y;
+
+			b.x = 1 + sign * normal.x * normal.x * scale;
+			b.y = sign * a.x;
+			b.z = -sign * normal.x;
+		}
     }
 }
