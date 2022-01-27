@@ -1380,7 +1380,7 @@ namespace Fp.Utility
         {
             AssertUtility.IsNormalized(start, nameof(start));
             AssertUtility.IsNormalized(end, nameof(end));
-            Assert.IsTrue(t is >= 0 and <= 1, $"t({t}) is >= 0 and <= 1");
+            Assert.IsTrue(t >= 0 && t <= 1, $"t({t}) is >= 0 and <= 1");
             
             // Dot product - the cosine of the angle between 2 vectors.
             float dot = Vector3.Dot(start, end);
