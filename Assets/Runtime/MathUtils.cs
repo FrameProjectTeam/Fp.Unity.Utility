@@ -224,17 +224,17 @@ namespace Fp.Utility
 
         public static readonly float MachineSngEpsilon = ComputeMachineEpsilon();
 
-        public static bool IsReal(float f)
+        public static bool IsReal(this float f)
         {
             return !float.IsNaN(f) && !float.IsNegativeInfinity(f) && !float.IsPositiveInfinity(f);
         }
 
-        public static bool IsReal(double f)
+        public static bool IsReal(this double f)
         {
             return !double.IsNaN(f) && !double.IsNegativeInfinity(f) && !double.IsPositiveInfinity(f);
         }
 
-        public static bool IsPowerOfTwo(ulong value)
+        public static bool IsPowerOfTwo(this ulong value)
         {
             return value != 0 && (value & (value - 1)) == 0;
         }
@@ -1193,6 +1193,7 @@ namespace Fp.Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Map01(float value, float min, float max)
         {
+			Assert.IsTrue(max > min, $"max({max}) > min({min})");
             return (value - min) / (max - min);
         }
 
@@ -1591,6 +1592,12 @@ namespace Fp.Utility
             float k = Mathf.Pow(1 - bias, 3);
 
             return (x * k) / (x * k - x + 1);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Inverse(float v, float fallback = float.MaxValue)
+        {
+            return Mathf.Approximately(v, 0) ? fallback : 1f / v;
         }
     }
 }

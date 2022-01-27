@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Fp.Utility
 {
@@ -1322,5 +1323,119 @@ namespace Fp.Utility
 			b.y = sign * a.x;
 			b.z = -sign * normal.x;
 		}
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 Inverse(this Vector2 v, float fallbackValue = float.MaxValue)
+        {
+            return new Vector2(MathUtils.Inverse(v.x, fallbackValue), MathUtils.Inverse(v.y, fallbackValue));
+        }
+        
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 Inverse(this Vector3 v, float fallbackValue = float.MaxValue)
+        {
+            return new Vector2(MathUtils.Inverse(v.x, fallbackValue), MathUtils.Inverse(v.y, fallbackValue));
+        }
+
+        /// <summary>
+        /// Linear interpolation
+        /// </summary>
+        /// <param name="start">Start point of interpolation line</param>
+        /// <param name="end">End point of interpolation line</param>
+        /// <param name="t">Interpolation time, or percentage of interpolation</param>
+        /// <returns>Interpolated vector</returns>
+        public static Vector3 Lerp(Vector3 start, Vector3 end, float t)
+        {
+#if USE_PRECISE_LERP
+            // Precise method, which guarantees v = v1 when t = 1. This method is monotonic only when v0 * v1 < 0. Interpolation between same values might not produce the same value
+            return (1 - t) * start + t * end;
+
+#else
+            // Imprecise method, which does not guarantee v = v1 when t = 1, due to floating-point arithmetic error. This method is monotonic
+            // This form may be used when the hardware has a native fused multiply-add instruction.
+            return start + t * (end - start);
+#endif
+        }
+
+        /// <summary>
+        /// Linear interpolation with normalization
+        /// </summary>
+        /// <param name="start">Start point of interpolation segment</param>
+        /// <param name="end">End point of interpolation segment</param>
+        /// <param name="t">Interpolation time, or percentage of interpolation</param>
+        /// <returns>Normalized interpolated point</returns>
+        public static Vector3 Nlerp(Vector3 start, Vector3 end, float t)
+        {
+            return Vector3.Normalize(Lerp(start, end, t));
+        }
+
+        /// <summary>
+        /// Spherical interpolation, works only with normalized vectors
+        /// </summary>
+        /// <param name="start">Start point of interpolation segment</param>
+        /// <param name="end">End point of interpolation segment</param>
+        /// <param name="t">Interpolation time, or percentage of interpolation</param>
+        /// <returns>Interpolated vector</returns>
+        public static Vector3 Slerp(Vector3 start, Vector3 end, float t)
+        {
+            AssertUtility.IsNormalized(start, nameof(start));
+            AssertUtility.IsNormalized(end, nameof(end));
+            Assert.IsTrue(t is >= 0 and <= 1, $"t({t}) is >= 0 and <= 1");
+            
+            // Dot product - the cosine of the angle between 2 vectors.
+            float dot = Vector3.Dot(start, end);
+            // Clamp it to be in the range of Acos()
+            // This may be unnecessary, but floating point
+            // precision can be a fickle mistress.
+            dot = Mathf.Clamp(dot, -1.0f, 1.0f);
+            // Acos(dot) returns the angle between start and end,
+            // And multiplying that by percent returns the angle between
+            // start and the final result.
+            float theta = Mathf.Acos(dot) * t;
+            Vector3 relativeVec = Vector3.Normalize(end - start * dot);
+            // Orthonormal basis
+            // The final result.
+            return start * Mathf.Cos(theta) + relativeVec * Mathf.Sin(theta);
+        }
+
+        /// <summary>
+        /// Checks if vector is normalized
+        /// </summary>
+        /// <param name="value">Vector value</param>
+        /// <returns>true - if vector is normalized</returns>
+        public static bool IsNormalized(this Vector3 value)
+        {
+            return Mathf.Approximately(value.sqrMagnitude, 1);
+        }
+        
+        /// <summary>
+        /// Checks if vector is normalized
+        /// </summary>
+        /// <param name="value">Vector value</param>
+        /// <returns>true - if vector is normalized</returns>
+        public static bool IsNormalized(this Vector2 value)
+        {
+            return Mathf.Approximately(value.sqrMagnitude, 1);
+        }
+
+        /// <summary>
+        /// Checks if all vector component is real number
+        /// </summary>
+        /// <param name="value">Vector value</param>
+        /// <returns>true - if all vector component is real number</returns>
+        public static bool IsReal(this Vector3 value)
+        {
+            return value.x.IsReal() && value.y.IsReal() && value.z.IsReal();
+        }
+        
+        /// <summary>
+        /// Checks if all vector component is real number
+        /// </summary>
+        /// <param name="value">Vector value</param>
+        /// <returns>true - if all vector component is real number</returns>
+        public static bool IsReal(this Vector2 value)
+        {
+            return value.x.IsReal() && value.y.IsReal();
+        }
     }
 }

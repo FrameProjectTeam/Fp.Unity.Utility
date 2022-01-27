@@ -5,17 +5,26 @@ namespace Fp.Utility
 {
     public static class AssertUtility
     {
-        public static void IsVectorValid(Vector2 value, string paramName = nameof(Vector2))
+        public static void IsVectorReal(Vector2 value, string paramName = nameof(Vector2))
         {
-            Assert.IsTrue(MathUtils.IsReal(value.x), $"IsReal({paramName}.x)");
-            Assert.IsTrue(MathUtils.IsReal(value.y), $"IsReal({paramName}.y)");
+            Assert.IsTrue(value.IsReal(), $"{paramName}.{nameof(VectorMath.IsReal)}()");
         }
 
-        public static void IsVectorValid(Vector3 value, string paramName = nameof(Vector3))
+        public static void IsVectorReal(Vector3 value, string paramName = nameof(Vector3))
         {
-            Assert.IsTrue(MathUtils.IsReal(value.x), $"IsReal({paramName}.x)");
-            Assert.IsTrue(MathUtils.IsReal(value.y), $"IsReal({paramName}.y)");
-            Assert.IsTrue(MathUtils.IsReal(value.z), $"IsReal({paramName}).z");
+            Assert.IsTrue(value.IsReal(), $"{paramName}.{nameof(VectorMath.IsReal)}()");
+        }
+
+        public static void IsNormalized(Vector3 value, string paramName = nameof(Vector3))
+        {
+            IsVectorReal(value);
+            Assert.IsTrue(value.IsNormalized(), $"{paramName}.{nameof(VectorMath.IsNormalized)}()");
+        }
+        
+        public static void IsNormalized(Vector2 value, string paramName = nameof(Vector3))
+        {
+            IsVectorReal(value);
+            Assert.IsTrue(value.IsNormalized(), $"{paramName}.{nameof(VectorMath.IsNormalized)}()");
         }
     }
 }
