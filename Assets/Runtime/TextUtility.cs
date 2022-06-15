@@ -142,7 +142,7 @@ namespace Fp.Utility
             }
         }
         
-        private static string DictionaryToString(IReadOnlyDictionary<string, string> dictionary)
+        public static string DictionaryToString(this IReadOnlyDictionary<string, string> dictionary)
         {
             try
             {
@@ -155,7 +155,7 @@ namespace Fp.Utility
             }
         }
 
-        private static void DictionaryToString(this IReadOnlyDictionary<string, string> dictionary, StringBuilder sb)
+        public static void DictionaryToString(this IReadOnlyDictionary<string, string> dictionary, StringBuilder sb)
         {
             sb.Append("{");
             
