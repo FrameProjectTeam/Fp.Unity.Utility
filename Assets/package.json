@@ -1,10 +1,10 @@
 {
   "name": "com.fp.utility",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "displayName": "Runtime Utility",
   "description": "Runtime utilities and tools classes",
   "unity": "2019.1",
-  "keywords": ["Utility", "Math"],
+  "keywords": ["Utility", "Math", "Text"],
   "author": { "name": "Frame Project", "email": "Yevhenii.Vitiuk@gmail.com"},
   "license": "MIT"
 }

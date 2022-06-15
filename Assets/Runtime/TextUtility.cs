@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Fp.Utility
 {
-    public static class StringUtils
+    public static class TextUtility
     {
         private const int RomanDigitsValuesLastIdx = 12; // RomanDigitsValues.Length - 1;
         
@@ -17,7 +17,7 @@ namespace Fp.Utility
         
         private static readonly string[] OrdinalSuffixes = { "th", "st", "nd", "rd" };
         
-        private static readonly StringBuilder _tempBuilder = new StringBuilder();
+        private static readonly StringBuilder s_sb = new StringBuilder();
 
         public static ulong CalculateHash(this string text)
         {
@@ -59,14 +59,14 @@ namespace Fp.Utility
             {
                 foreach (byte t in data)
                 {
-                    _tempBuilder.Append(t.ToString("x2"));
+                    s_sb.Append(t.ToString("x2"));
                 }
 
-                return _tempBuilder.ToString();
+                return s_sb.ToString();
             }
             finally
             {
-                _tempBuilder.Clear();
+                s_sb.Clear();
             }
         }
 
@@ -115,12 +115,12 @@ namespace Fp.Utility
         {
             try
             {
-                _tempBuilder.AppendRomanNumber(number);
-                return _tempBuilder.ToString();
+                s_sb.AppendRomanNumber(number);
+                return s_sb.ToString();
             }
             finally
             {
-                _tempBuilder.Clear();
+                s_sb.Clear();
             }
         }
 
@@ -140,6 +140,43 @@ namespace Fp.Utility
                     break;
                 }
             }
+        }
+        
+        private static string DictionaryToString(IReadOnlyDictionary<string, string> dictionary)
+        {
+            try
+            {
+                dictionary.DictionaryToString(s_sb);
+                return s_sb.ToString();
+            }
+            finally
+            {
+                s_sb.Clear();
+            }
+        }
+
+        private static void DictionaryToString(this IReadOnlyDictionary<string, string> dictionary, StringBuilder sb)
+        {
+            sb.Append("{");
+            
+            var first = true;
+            foreach((string key, string value) in dictionary)
+            {
+                if(!first)
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append("{");
+                sb.Append(key);
+                sb.Append(": ");
+                sb.Append(value);
+                sb.Append("}");
+
+                first = false;
+            }
+
+            sb.Append("}");
         }
     }
 }
